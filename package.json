@@ -1,0 +1,10 @@
+{
+  "name": "taskmanager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+  },
+  "author": "Jean Jr.",
+  "license": "ISC",
+  "description": "Gerenciador de tarefas e times"
+}
