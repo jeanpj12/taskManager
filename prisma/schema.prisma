@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  member
+  admin
+}
+
+enum StatusTask {
+  pending
+  in_progress
+  completed
+}
+
+enum PriorityTask {
+  high
+  medium
+  low
+}
+
+model User {
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  password    String
+  role        UserRole      @default(member)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime?     @updatedAt @map("updated_at")
+  TeamMembers TeamMembers[]
+  Tasks       Tasks[]
+  TaskHistory TaskHistory[]
+
+  @@map("users")
+}
+
+model Teams {
+  id          String        @id @default(uuid())
+  name        String
+  desciption  String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime?     @updatedAt @map("updated_at")
+  TeamMembers TeamMembers[]
+  Tasks       Tasks[]
+
+  @@map("teams")
+}
+
+model TeamMembers {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  teamId    String   @map("team_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User  @relation(fields: [userId], references: [id])
+  team Teams @relation(fields: [teamId], references: [id])
+
+  @@map("team_members")
+}
+
+model Tasks {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  status      StatusTask
+  priority    PriorityTask
+  assignedTo  String       @map("assigned_to")
+  teamId      String       @map("team_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime?    @updatedAt @map("updated_at")
+
+  user        User          @relation(fields: [assignedTo], references: [id])
+  team        Teams         @relation(fields: [teamId], references: [id])
+  TaskHistory TaskHistory[]
+
+  @@map("tasks")
+}
+
+model TaskHistory {
+  id        String     @id @default(uuid())
+  taskId    String     @map("task_id")
+  changedBy String     @map("changed_by")
+  oldStatus StatusTask @map("old_status")
+  newStatus StatusTask @map("new_status")
+  changedAt DateTime   @default(now()) @map("changed_at")
+
+  task Tasks @relation(fields: [taskId], references: [id])
+  user User  @relation(fields: [changedBy], references: [id])
+}
