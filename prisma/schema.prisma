@@ -91,4 +91,6 @@ model TaskHistory {
 
   task Tasks @relation(fields: [taskId], references: [id])
   user User  @relation(fields: [changedBy], references: [id])
+
+  @@map("task_history")
 }
