@@ -12,6 +12,24 @@ class TeamsMemberController {
 
         const { user_id, team_id } = bodySchema.parse(req.body)
 
+        const user = await prisma.user.findFirst({
+            where: { id: user_id }
+        })
+
+        if(!user){
+            throw new AppError('User not found.')
+        }
+
+        const team = await prisma.teams.findFirst({
+            where: {
+                id: team_id
+            }
+        })
+
+        if(!team){
+            throw new AppError('Team not found')
+        }
+
         const existingMembership = await prisma.teamMembers.findFirst({
             where: { userId: user_id, teamId: team_id }
         })
