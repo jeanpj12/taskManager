@@ -19,7 +19,7 @@ class TaskController {
             where: { id: assigned_to }
         })
 
-        if(!user){
+        if (!user) {
             throw new AppError('User not found.')
         }
 
@@ -29,11 +29,11 @@ class TaskController {
             }
         })
 
-        if(!team){
+        if (!team) {
             throw new AppError('Team not found')
         }
 
-        await prisma.tasks.create({
+        const task = await prisma.tasks.create({
             data: {
                 title,
                 description,
@@ -44,6 +44,51 @@ class TaskController {
             }
         })
 
-        res.status(201).json
+        if (!req.user?.id) {
+            throw new AppError('Authenticated user ID not found.', 401);
+        }
+
+        await prisma.taskHistory.create({
+            data: {
+                taskId: task.id,
+                changedBy: req.user.id,
+                newStatus: task.status,
+                oldStatus: task.status
+            }
+        })
+
+        res.status(201).json()
+    }
+
+    async index(req: Request, res: Response) {
+        const paramSchema = z.object({
+            user_id: z.string()
+        })
+
+        const { user_id } = paramSchema.parse(req.params)
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id: user_id
+            }
+        })
+
+        if(!user){
+            throw new AppError('User not found')
+        }
+
+        const data = await prisma.tasks.findMany({
+            where: {
+                assignedTo: user_id
+            },
+            include: {
+                user: {select: {name: true, email: true}},
+                team: {select: {name: true}}
+            }
+        })
+
+        res.json(data)
     }
 }
+
+export { TaskController }
