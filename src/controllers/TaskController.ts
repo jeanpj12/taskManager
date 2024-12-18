@@ -73,7 +73,7 @@ class TaskController {
             }
         })
 
-        if(!user){
+        if (!user) {
             throw new AppError('User not found')
         }
 
@@ -82,12 +82,58 @@ class TaskController {
                 assignedTo: user_id
             },
             include: {
-                user: {select: {name: true, email: true}},
-                team: {select: {name: true}}
+                user: { select: { name: true, email: true } },
+                team: { select: { name: true } }
             }
         })
 
         res.json(data)
+    }
+
+    async update(req: Request, res: Response) {
+
+        const bodySchema = z.object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+            assigned_to: z.string().optional(),
+            team_id: z.string().optional(),
+        })
+
+        const paramSchema = z.object({
+            task_id: z.string()
+        })
+
+        const { title, description, assigned_to, team_id } = bodySchema.parse(req.body)
+        const parsedBody = bodySchema.parse(req.body);
+        const { task_id } = paramSchema.parse(req.params)
+
+        if (Object.keys(parsedBody).length === 0) {
+            throw new AppError('At least one field must be provided.');
+        }
+
+        const task = await prisma.tasks.findFirst({
+            where: {
+                id: task_id
+            }
+        })
+
+        if (!task) {
+            throw new AppError('Task not found')
+        }
+
+        await prisma.tasks.update({
+            data: {
+                title,
+                description,
+                assignedTo: assigned_to,
+                teamId: team_id
+            },
+            where: {
+                id: task_id
+            }
+        })
+
+        res.json()
     }
 }
 
