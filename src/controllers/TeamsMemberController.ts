@@ -38,18 +38,28 @@ class TeamsMemberController {
 
         const { user_id } = paramSchema.parse(req.params)
 
+        const user = await prisma.user.findFirst({
+            where: {
+                id: user_id
+            }
+        })
+
+        if (!user) {
+            throw new AppError('User not found')
+        }
+
         const data = await prisma.teamMembers.findMany({
             where: {
                 userId: user_id
             },
             include: {
-                user: {select: {name: true, email: true}},
-                team: {select: {name: true, desciption: true}}
+                user: { select: { name: true, email: true } },
+                team: { select: { name: true, desciption: true } }
             }
         })
 
-        if(!data || data.length === 0) {
-            throw new AppError('User not found')
+        if (data.length === 0) {
+            throw new AppError('This user id not associated with any team')
         }
 
         res.json(data)
