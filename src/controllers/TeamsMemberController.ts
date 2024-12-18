@@ -13,7 +13,7 @@ class TeamsMemberController {
         const { user_id, team_id } = bodySchema.parse(req.body)
 
         const existingMembership = await prisma.teamMembers.findFirst({
-            where: {userId: user_id, teamId: team_id}
+            where: { userId: user_id, teamId: team_id }
         })
 
         if (existingMembership) {
@@ -28,6 +28,31 @@ class TeamsMemberController {
         })
 
         res.status(201).json()
+    }
+
+    async index(req: Request, res: Response) {
+
+        const paramSchema = z.object({
+            user_id: z.string()
+        })
+
+        const { user_id } = paramSchema.parse(req.params)
+
+        const data = await prisma.teamMembers.findMany({
+            where: {
+                userId: user_id
+            },
+            include: {
+                user: {select: {name: true, email: true}},
+                team: {select: {name: true, desciption: true}}
+            }
+        })
+
+        if(!data || data.length === 0) {
+            throw new AppError('User not found')
+        }
+
+        res.json(data)
     }
 }
 
