@@ -11,6 +11,7 @@ const teamsMemberController = new TeamsMemberController()
 teamsRouter.post("/create", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.create)
 teamsRouter.post("/associate", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsMemberController.create)
 teamsRouter.get("/show", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.show)
+teamsRouter.patch("/:team_id", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.update)
 teamsRouter.get("/:user_id", ensureAuthenticated, verifyUserAuthorization(['admin', 'member']), teamsMemberController.index)
 
 export { teamsRouter }

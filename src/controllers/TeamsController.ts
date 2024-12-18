@@ -1,4 +1,5 @@
 import { prisma } from '@/database/prisma'
+import { AppError } from '@/utils/AppError'
 import { Request, Response } from 'express'
 import z from 'zod'
 
@@ -19,6 +20,43 @@ class TeamsController {
         })
 
         res.status(201).json()
+
+    }
+
+    async update(req: Request, res: Response) {
+        const bodySchema = z.object({
+            name: z.string().min(6).optional(),
+            description: z.string().optional()
+        })
+
+        const paramSchema = z.object({
+            team_id: z.string()
+        })
+
+        const { name, description } = bodySchema.parse(req.body)
+        const { team_id } = paramSchema.parse(req.params)
+
+        const team = await prisma.teams.findFirst({
+            where: {
+                id: team_id
+            }
+        })
+
+        if(!team){
+            throw new AppError("Team not found.")
+        }
+
+        await prisma.teams.update({
+            data: {
+                name,
+                desciption: description
+            },
+            where: {
+                id: team_id
+            }
+        })
+
+        res.json()
 
     }
 
