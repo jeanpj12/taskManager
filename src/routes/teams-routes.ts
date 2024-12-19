@@ -12,6 +12,7 @@ teamsRouter.post("/create", ensureAuthenticated, verifyUserAuthorization(['admin
 teamsRouter.post("/associate", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsMemberController.create)
 teamsRouter.get("/show", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.show)
 teamsRouter.patch("/:team_id", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.update)
+teamsRouter.delete("/delete/:team_id", ensureAuthenticated, verifyUserAuthorization(['admin']), teamsController.remove)
 teamsRouter.get("/:user_id", ensureAuthenticated, verifyUserAuthorization(['admin', 'member']), teamsMemberController.index)
 
 export { teamsRouter }
