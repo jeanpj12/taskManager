@@ -135,6 +135,32 @@ class TaskController {
 
         res.json()
     }
+
+    async remove(req: Request, res: Response) {
+        const paramSchema = z.object({
+            task_id: z.string()
+        })
+
+        const { task_id } = paramSchema.parse(req.params)
+
+        const task = await prisma.tasks.findFirst({
+            where: {
+                id: task_id
+            }
+        })
+
+        if (!task) {
+            throw new AppError('Task not found')
+        }
+
+        await prisma.tasks.delete({
+            where: {
+                id: task_id
+            }
+        })
+
+        res.json()
+    }
 }
 
 export { TaskController }
