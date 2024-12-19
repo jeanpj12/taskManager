@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch --env-file .env src/server.ts"
+    "dev": "tsx watch --env-file .env src/server.ts",
+    "test:dev": "NODE_OPTIONS=--experimental-vm-modules npx jest --watchAll --runInBand"
   },
   "author": "Jean Jr.",
   "license": "ISC",
@@ -17,13 +18,15 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "supertest": "^7.0.0",
     "@prisma/client": "^6.0.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.2",
+    "@types/supertest": "^6.0.2",
     "jest": "^29.7.0",
-    "superjest": "^0.3.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
